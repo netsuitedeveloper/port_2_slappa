@@ -1,0 +1,83 @@
+<td id="review_2016" class="text-align: center;">
+    <div id="review_whole" >
+        <div id="review_top">
+            <b>Hi <label id="_firstname" style="color:#00b8ff;"><%=getCurrentAttribute('customer','firstname')%></label> <label id="_lastname" style="color:#00b8ff;"><%=getCurrentAttribute('customer','lastname')%></label> - thank you for taking the time to review the SLAPPA products you purchased</b>
+            <p>once you complete the below feedback form you will receive a 10% off discount code</p>
+        </div>
+        <div id="review_content" style="width: 100%; height: auto; ">
+            <ul id="product_content" style=" text-align : center; list-style : none; padding : 0; margin : 0px 0px 0px 0px;">
+            </ul>
+            <b id ="sorry_content" style="margin-bottom: 40px; margin-top: 40px;"></b>
+        </div>    
+        <div id="review_bottom">
+            <div id="review_bottom_title">
+                <p>Thank you for being a loyal SLAPPA customer. As a family owned and operated business, we are always listening <br>to your feedback so please don't hesitate to contact us via <label style="color: #00b8ff;"><a href="#" style=" color: #00b8ff;">email</a> or call 704-676-4891 <label style="font-size: smaller;">(10am-4pm ET, Mon-Fri)</label> </label></p>
+                <b>SLAPPA products have been endored and recommended by top publications around the globe</b>
+            </div>
+            <div id="review_bottom_mark" style="padding-top: 20px;">
+                <ul>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200871&c=455532&h=76e064df723c91819f63&whence="/></a></li>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200876&c=455532&h=89d827b0c4d8c845c595&whence="/></a></li>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200874&c=455532&h=602a651a187502588ab4&whence="/></a></li>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200869&c=455532&h=3dd5850910f8f8aebd49&whence="/></a></li>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200878&c=455532&h=c8c4a66ceb4fb3e3b695&whence="/></a></li>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200875&c=455532&h=2bfd352f33da2070517e&whence="/></a></li>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200873&c=455532&h=d918416b1e0a425ff263&whence="/></a></li>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200872&c=455532&h=4eebba69e138b36b562e&whence="/></a></li>
+                    <li><a href="#"><img src="/core/media/media.nl?id=200870&c=455532&h=1b4b07221435f557ec34&whence="/></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+<script>
+var _firstname = document.getElementById('_firstname').textContent; //console.log(_firstname);
+var _lastname= document.getElementById('_lastname').textContent;
+
+//var _firstname="alexandra";
+//var _lastname="leone";
+
+var e_mail="brendanlcarr@gmail.com";
+//var JSON_PARSE_URI = 'https://system.netsuite.com/app/site/hosting/scriptlet.nl?script=162&deploy=2'+'&cust_email=' + e_mail;
+var JSON_PARSE_URI = '/app/site/hosting/scriptlet.nl?script=163&deploy=1';
+var JSON_PARSE_COUPON_URI= '/app/site/hosting/scriptlet.nl?script=165&deploy=1';
+
+$.get(JSON_PARSE_URI, {'firstname':_firstname, 'lastname':_lastname}, function(data_response){
+    if(data_response == ']'){
+        var form = document.getElementById('sorry_content');
+        form.innerHTML='<b style="margin-top: 40px; margin-bottom: 40px;">Sorry... Can not find any products you purchased 15 days ago</b>';
+//        var btn = document.getElementById('send_coupon');
+//        btn.setAttribute('style',"display:none;");
+    } else {
+        var _detail = JSON.parse(data_response);     
+        _detail.forEach(function(_info){
+           
+            var product_content_ul = document.getElementById('product_content');
+            var newdiv = document.createElement('li');
+            
+            newdiv.setAttribute('style',"  display: inline-block; width : 33%; height:380px;"); 
+            newdiv.innerHTML = '<div style="width:500px;  text-align:left; padding-top:20px;"><img src="'+_info['thumbnailurl']+'" style="float:left;"/><div style="height:40px;"></div><label style="text-align:left; width:150px; padding-top:40px;">'+_info['displayname']+'</label></div><div name="review_form_content" id="review_form_content" style="height:300px; background: transparent none repeat scroll 0% 0%;" ><iframe style="border: medium none; height: 300px; display: block !important;" src="https://forms.netsuite.com/app/site/crm/externalcustrecordpage.nl?compid=455532&amp;formid=1&amp;h=f45a34671c15e4ba7cfc&amp;redirect_count=1&amp;did_javascript_redirect=T&amp;custrecordreviewnsitemid='+_info['internalid']+'&custrecordreviewreviewer='+_info['altname']+'&custrecordreviewlocation='+_info['address']+'" ></iframe></div>';
+            product_content_ul.appendChild(newdiv);
+            
+
+        });
+		    var review_content_form = document.getElementById('review_content');
+            var newbtn = document.createElement('button');
+            //<button id = "send_coupon" onclick="Send_Coupon_Email()" style="  background-image: none; outline: 0 !important;   width: 200px; height: 50px; background-color:#00b8ff; font-size: 15px; color:#fff; ">Email Coupon Code</button>
+            newbtn.setAttribute('style',"  background-image: none; outline: 0 !important;   width: 200px; height: 50px; background-color:#00b8ff; font-size: 15px; color:#fff; ");
+            newbtn.setAttribute('onclick',"Send_Coupon_Email()");
+            newbtn.innerHTML = 'Email Coupon Code';
+            review_content_form.appendChild(newbtn);
+        e_mail=_detail[0]['email'];
+    }
+    
+});
+
+    function Send_Coupon_Email(){
+        $.get(JSON_PARSE_COUPON_URI, {'cust_email':e_mail,'firstname':_firstname, 'lastname':_lastname}, function(){
+           // document.getElementById('send_coupon').disabled=true;
+        });
+    }
+</script>
+
+</td>
